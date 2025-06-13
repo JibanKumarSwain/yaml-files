@@ -1,0 +1,39 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: node-app-deployment
+  namespace: java
+  labels:
+    app: node-app
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: node-app
+  template:
+    metadata:
+      labels:
+        app: node-app
+    spec:
+      containers:
+        - name: node-app
+          image: jibankumar/new  # Your Node.js app image
+          ports:
+            - containerPort: 5000
+          volumeMounts:
+            - mountPath: /var/www/html
+              name: node-app-pv
+          resources:
+            limits:
+              cpu: "2"
+              memory: "2Gi"
+            requests:
+              cpu: "500m"
+              memory: "512Mi"
+          envFrom:
+            - secretRef:
+                name: node-app-secret
+      volumes:
+        - name: node-app-pv
+          persistentVolumeClaim:
+            claimName: node-app-pvc
